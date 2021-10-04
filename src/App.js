@@ -24,7 +24,8 @@ class App extends React.Component {
         // SETUP THE INITIAL STATE
         this.state = {
             currentList : null,
-            sessionData : loadedSessionData
+            sessionData: loadedSessionData,
+            cureenthover: null
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -142,6 +143,55 @@ class App extends React.Component {
         let modal = document.getElementById("delete-modal");
         modal.classList.remove("is-visible");
     }
+
+    renameItem = (key, newName) => {
+        let currentList = this.state.currentList;
+        currentList.items[key] = newName;
+
+        this.setState(prevState => ({
+           currentList: currentList
+        }), () => {
+           // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
+           // THE TRANSACTION STACK IS CLEARED
+           let index=key;
+           let list = this.db.queryGetList(currentList.key);
+           list.items[index] = newName;
+           this.db.mutationUpdateList(list);
+           this.db.mutationUpdateSessionData(this.state.sessionData);
+       });
+    }
+
+    hover = (name) => {
+        console.log(name );
+        this.setState({
+            cureenthover: name
+        });
+    }
+
+    release=(name)=> {
+        let currentList = this.state.currentList;
+        let temp = currentList.items[name];
+        let idex = this.state.cureenthover;
+        currentList.items.splice(name, 1);
+        currentList.items.splice(idex, 0, temp);
+        console.log(name + '+' + idex);
+
+        this.setState(prevState => ({
+            currentList: currentList
+        }), () => {
+            // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
+            // THE TRANSACTION STACK IS CLEARED
+                let index1 = name;
+                let index2 = this.state.cureenthover;
+                let list = this.db.queryGetList(currentList.key);
+                let temp = list.items[index1];
+                list.items.splice(name, 1);
+                list.items.splice(idex, 0, temp);
+            this.db.mutationUpdateList(list);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
+    }
+
     render() {
         return (
             <div id="app-root">
@@ -158,7 +208,11 @@ class App extends React.Component {
                     renameListCallback={this.renameList}
                 />
                 <Workspace
-                    currentList={this.state.currentList} />
+                    currentList={this.state.currentList}
+                    renameItemCallback={this.renameItem}
+                    hoverCallback={this.hover}
+                    dragendCallback={this.release}
+                />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal

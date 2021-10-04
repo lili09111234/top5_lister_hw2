@@ -1,8 +1,12 @@
 import React from "react";
+import ItemCard from "./ItemCard";
 
 export default class Workspace extends React.Component {
-    render() {
-        const {currentList} = this.props;
+   
+   
+   render() {
+       const { currentList, renameItemCallback, hoverCallback, dragendCallback} = this.props;
+       
         if(currentList!=null){
             return (
                 <div id="top5-workspace">
@@ -15,13 +19,52 @@ export default class Workspace extends React.Component {
                             <div className="item-number">5.</div>
                         </div>
                         <div id="edit-items">
-                        {
-                                currentList.items.map((item)=>
-                                    (
-                                    <div class="top5-item">{item}</div>
-                                    )
-                                )
-                        }
+                            <ItemCard
+                                id={0}
+                                key={0}
+                                editActive={false}
+                                hoverCallback={hoverCallback}
+                                item={currentList.items[0]}
+                                renameItemCallback={renameItemCallback}
+                                dragendCallback={dragendCallback}
+                        />
+                            <ItemCard
+                                id={1}
+                                key={1}
+                                editActive={false}
+                                item={currentList.items[1]}
+                                hoverCallback={hoverCallback}
+                                renameItemCallback={renameItemCallback}
+                                dragendCallback={dragendCallback}
+                        />
+                            <ItemCard
+                                id={2}
+                                key={2}
+                                hoverCallback={hoverCallback}
+                                editActive={false}
+                                item={currentList.items[2]}
+                                renameItemCallback={renameItemCallback}
+                                dragendCallback={dragendCallback}
+                        />
+                            <ItemCard
+                                id={3}
+                                hoverCallback={hoverCallback}
+                                editActive={false}
+                                key={3}
+                                item={currentList.items[3]}
+                                renameItemCallback={renameItemCallback}
+                                dragendCallback={dragendCallback}
+                        />
+                            <ItemCard
+                                id={4}
+                                hoverCallback={hoverCallback}
+                                editActive={false}
+                                key={4}
+                                item={currentList.items[4]}
+                                renameItemCallback={renameItemCallback}
+                                dragendCallback={dragendCallback}
+                        />
+                            
                         </div>
                     </div>
                 </div>

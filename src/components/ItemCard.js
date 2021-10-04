@@ -7,6 +7,7 @@ export default class ItemCard extends React.Component {
         this.state = {
             text: this.props.item,
             editActive: this.props.editActive,
+            green: this.props.green
         }
     }
     handleToggleEdit = (event) => {
@@ -35,10 +36,15 @@ export default class ItemCard extends React.Component {
 
     handleonHover = () => {
         this.props.hoverCallback(this.props.id);
+        this.setState({ green: true });
     }
 
     handledragend = () => {
         this.props.dragendCallback(this.props.id);
+    }
+    handledragLeave = () => {
+        console.log('run away');
+        this.setState({ green: false }); 
     }
 
     render() {
@@ -56,15 +62,31 @@ export default class ItemCard extends React.Component {
                     defaultValue={item}
                 />)
         }
-        else {
+        else if (this.state.green) {
             return (
                 <div
-                    id={'Item'+id}
+                    id={'Item' + id}
                     draggable='true'
                     onDragOver={this.handleonHover}
                     onDragEnd={this.handledragend}
-                    onClick ={this.handleClick}
-                    className={'top5-item'}                    
+                    onDragLeave={this.handledragLeave}
+                    onClick={this.handleClick}
+                    className={'top5-item-dragged-to'}
+                >
+                    {item}
+                </div>
+            );
+        }
+        else {
+            return (
+                <div
+                    id={'Item' + id}
+                    draggable='true'
+                    onDragOver={this.handleonHover}
+                    onDragEnd={this.handledragend}
+                    onDragLeave={this.handledragLeave}
+                    onClick={this.handleClick}
+                    className={'top5-item'}
                 >
                     {item}
                 </div>

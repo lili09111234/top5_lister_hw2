@@ -25,7 +25,8 @@ class App extends React.Component {
         this.state = {
             currentList : null,
             sessionData: loadedSessionData,
-            cureenthover: null
+            cureenthover: null,
+            tobedeletednamepair: null
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -125,11 +126,12 @@ class App extends React.Component {
             // ANY AFTER EFFECTS?
         });
     }
-    deleteList = () => {
+    deleteList = (namepair) => {
         // SOMEHOW YOU ARE GOING TO HAVE TO FIGURE OUT
         // WHICH LIST IT IS THAT THE USER WANTS TO
         // DELETE AND MAKE THAT CONNECTION SO THAT THE
         // NAME PROPERLY DISPLAYS INSIDE THE MODAL
+        this.setState({ tobedeletednamepair: namepair})
         this.showDeleteListModal();
     }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
@@ -174,7 +176,7 @@ class App extends React.Component {
         let idex = this.state.cureenthover;
         currentList.items.splice(name, 1);
         currentList.items.splice(idex, 0, temp);
-        console.log(name + '+' + idex);
+ 
 
         this.setState(prevState => ({
             currentList: currentList
@@ -190,6 +192,12 @@ class App extends React.Component {
             this.db.mutationUpdateList(list);
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
+    }
+
+    delete = () => {
+
+
+
     }
 
     render() {
@@ -216,6 +224,8 @@ class App extends React.Component {
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal
+                    listKeyPair={this.state.tobedeletednamepair}
+                    //deleteCallback={this.delete}
                     hideDeleteListModalCallback={this.hideDeleteListModal}
                 />
             </div>

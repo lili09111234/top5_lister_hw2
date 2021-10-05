@@ -43,7 +43,6 @@ export default class ItemCard extends React.Component {
         this.props.dragendCallback(this.props.id);
     }
     handledragLeave = () => {
-        console.log('run away');
         this.setState({ green: false }); 
     }
 

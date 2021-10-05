@@ -164,7 +164,6 @@ class App extends React.Component {
     }
 
     hover = (name) => {
-        console.log(name );
         this.setState({
             cureenthover: name
         });
@@ -188,15 +187,56 @@ class App extends React.Component {
                 let list = this.db.queryGetList(currentList.key);
                 let temp = list.items[index1];
                 list.items.splice(name, 1);
-                list.items.splice(idex, 0, temp);
+                list.items.splice(index2, 0, temp);
             this.db.mutationUpdateList(list);
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
 
     delete = () => {
+        this.hideDeleteListModal();
+        if (this.state.currentList!=null && this.state.currentList.name == this.state.tobedeletednamepair.name) {
+            this.setState(prevState => ({
+                currentList: null
+            }), () => {
+                // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
+                // THE TRANSACTION STACK IS CLEARED
+                let key = this.state.tobedeletednamepair.key;
+                let keyNamePair = this.state.sessionData.keyNamePairs;
+                for (let i = 0; i < keyNamePair.length; i++) {
 
+                    let target = keyNamePair[i];
 
+                    if (target.key == key)
+                        this.state.sessionData.keyNamePairs.splice(i, 1);
+                }
+                this.state.sessionData.counter -= 1;
+                this.db.delete(key);
+                this.db.mutationUpdateSessionData(this.state.sessionData);
+                this.forceUpdate();
+            });
+        }
+        else {
+            this.setState(prevState => ({
+                currentList: this.state.currentList
+            }), () => {
+                // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
+                // THE TRANSACTION STACK IS CLEARED
+                let key = this.state.tobedeletednamepair.key;
+                let keyNamePair = this.state.sessionData.keyNamePairs;
+                for (let i = 0; i < keyNamePair.length; i++) {
+
+                    let target = keyNamePair[i];
+
+                    if (target.key == key)
+                        this.state.sessionData.keyNamePairs.splice(i, 1);
+                }
+                this.state.sessionData.counter -= 1;
+                this.db.delete(key);
+                this.db.mutationUpdateSessionData(this.state.sessionData);
+                this.forceUpdate();
+            });
+        }
 
     }
 
@@ -225,7 +265,7 @@ class App extends React.Component {
                     currentList={this.state.currentList} />
                 <DeleteModal
                     listKeyPair={this.state.tobedeletednamepair}
-                    //deleteCallback={this.delete}
+                    deleteCallback={this.delete}
                     hideDeleteListModalCallback={this.hideDeleteListModal}
                 />
             </div>

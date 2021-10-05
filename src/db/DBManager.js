@@ -30,6 +30,18 @@ export default class DBManager {
         let listString = JSON.stringify(list);
         localStorage.setItem("top5-list-" + list.key, listString);
     }
+
+    delete = (key) => {
+        
+        localStorage.removeItem("top5-list-" + key);
+        let sessionDataString = localStorage.getItem("top5-data");
+        
+        let sessionData = JSON.parse(sessionDataString);
+
+        console.log(sessionData);
+        let returnsessiondata = JSON.stringify(sessionData);
+        localStorage.setItem("top5-data", returnsessiondata);
+    }
     
     mutationUpdateSessionData = (sessionData) => {
         let sessionDataString = JSON.stringify(sessionData);

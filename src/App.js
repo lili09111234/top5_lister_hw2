@@ -71,6 +71,7 @@ class App extends React.Component {
             // PUTTING THIS NEW LIST IN PERMANENT STORAGE
             // IS AN AFTER EFFECT
             this.db.mutationCreateList(newList);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
     renameList = (key, newName) => {
@@ -118,12 +119,14 @@ class App extends React.Component {
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
+        
         this.setState(prevState => ({
             currentList: null,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             sessionData: this.state.sessionData
         }), () => {
             // ANY AFTER EFFECTS?
+            this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
     deleteList = (namepair) => {
@@ -195,7 +198,7 @@ class App extends React.Component {
 
     delete = () => {
         this.hideDeleteListModal();
-        if (this.state.currentList!=null && this.state.currentList.name == this.state.tobedeletednamepair.name) {
+        if (this.state.currentList!=null && this.state.currentList.name === this.state.tobedeletednamepair.name) {
             this.setState(prevState => ({
                 currentList: null
             }), () => {
@@ -207,7 +210,7 @@ class App extends React.Component {
 
                     let target = keyNamePair[i];
 
-                    if (target.key == key)
+                    if (target.key === key)
                         this.state.sessionData.keyNamePairs.splice(i, 1);
                 }
                 this.state.sessionData.counter -= 1;
@@ -228,7 +231,7 @@ class App extends React.Component {
 
                     let target = keyNamePair[i];
 
-                    if (target.key == key)
+                    if (target.key === key)
                         this.state.sessionData.keyNamePairs.splice(i, 1);
                 }
                 this.state.sessionData.counter -= 1;

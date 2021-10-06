@@ -8,14 +8,39 @@ export default class EditToolbar extends React.Component {
         if (sessionstack !== []) {
             reallenght = sessionstack.length;
         }
-        if (this.props.currentList != null && this.props.sessionstackpoint !== 0 && reallenght - 1 <= this.props.sessionstackpoint) {
-            console.log(this.props.currentList);
-            console.log(this.havelist);
+        if (this.props.currentList != null && this.props.sessionstackpoint === 0 && reallenght - 1 <= this.props.sessionstackpoint) {
+
             return (
                 <div id="edit-toolbar">
                     <div
                         id='undo-button'
-                        className={"top5-button"}
+                        className="top5-button-disabled"
+                    >
+                        &#x21B6;
+                    </div>
+                    <div
+                        id='redo-button'
+                        className="top5-button-disabled"
+                    >
+                        &#x21B7;
+                    </div>
+                    <div
+                        id='close-button'
+                        className="top5-button"
+                        onClick={closeCallback}
+                    >
+                        &#x24E7;
+                    </div>
+                </div>
+            )
+        }
+        else if (this.props.currentList != null && this.props.sessionstackpoint !== 0 && reallenght - 1 <= this.props.sessionstackpoint) {
+            
+            return (
+                <div id="edit-toolbar">
+                    <div
+                        id='undo-button'
+                        className="top5-button"
                         onClick={undoCallback}
                     >
                         &#x21B6;
@@ -37,13 +62,12 @@ export default class EditToolbar extends React.Component {
             )
         }
         else if (this.props.currentList != null && this.props.sessionstackpoint === 0 && reallenght - 1 > this.props.sessionstackpoint) {
-            console.log(this.props.currentList);
-            console.log(this.havelist);
+           
             return (
                 <div id="edit-toolbar">
                     <div
                         id='undo-button'
-                        className={"top5-button-disabled"}
+                        className="top5-button-disabled"
                     >
                         &#x21B6;
                     </div>
@@ -65,13 +89,12 @@ export default class EditToolbar extends React.Component {
             )
         }
         else if (this.props.currentList != null && this.props.sessionstackpoint !== 0 && reallenght-1 > this.props.sessionstackpoint) {
-            console.log(this.props.currentList);
-            console.log(this.havelist);
+           
             return (
                 <div id="edit-toolbar">
                     <div
                         id='undo-button'
-                        className={"top5-button"}
+                        className="top5-button"
                         onClick={undoCallback}
                     >
                         &#x21B6;
@@ -98,7 +121,7 @@ export default class EditToolbar extends React.Component {
                 <div id="edit-toolbar">
                     <div
                         id='undo-button'
-                        className={"top5-button-disabled"}
+                        className="top5-button-disabled"
                         
                     >
                         &#x21B6;

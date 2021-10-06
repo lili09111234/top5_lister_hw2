@@ -26,7 +26,9 @@ class App extends React.Component {
             currentList : null,
             sessionData: loadedSessionData,
             cureenthover: null,
-            tobedeletednamepair: null
+            tobedeletednamepair: null,
+            sessionstack: [],
+            sessionstackpoint: -1
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -108,14 +110,38 @@ class App extends React.Component {
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
+    click = (key) => {
+        
+        this.setState(prevState => ({
+            sessionstackpoint: -1,
+            sessionstack: []
+        }), () => {
+            this.loadList(key);
+        });
+    }
     loadList = (key) => {
         let newCurrentList = this.db.queryGetList(key);
+        let sessionstack = this.state.sessionstack;
+        let newlist = JSON.parse(JSON.stringify(newCurrentList));
+        if (this.state.sessionstackpoint === -1) {
+            sessionstack.push(newlist);
+            this.setState(prevState => ({
+                sessionstack: sessionstack,
+                sessionstackpoint: 0,
+                currentList: newCurrentList,
+                sessionData: prevState.sessionData
+            }), () => {
+                // ANY AFTER EFFECTS?
+            })
+        }
+        else { 
         this.setState(prevState => ({
             currentList: newCurrentList,
-            sessionData: prevState.sessionData
+            sessionData: prevState.sessionData,
         }), () => {
             // ANY AFTER EFFECTS?
         });
+    }
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
@@ -123,7 +149,9 @@ class App extends React.Component {
         this.setState(prevState => ({
             currentList: null,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
-            sessionData: this.state.sessionData
+            sessionData: this.state.sessionData,
+            sessionstack: [],
+            sessionstackpoint: -1
         }), () => {
             // ANY AFTER EFFECTS?
             this.db.mutationUpdateSessionData(this.state.sessionData);
@@ -152,8 +180,15 @@ class App extends React.Component {
     renameItem = (key, newName) => {
         let currentList = this.state.currentList;
         currentList.items[key] = newName;
-
+        let sessions = this.state.sessionstack;
+       
+        
+        let actuallist = JSON.parse(JSON.stringify(this.state.currentList));
+        sessions.push(actuallist);
+        sessions.splice(this.state.sessionstackpoint, sessions.length - this.state.sessionstackpoint - 2);
         this.setState(prevState => ({
+            sessionstackpoint: this.state.sessionstackpoint+1,
+            sessionstack: sessions,
            currentList: currentList
         }), () => {
            // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
@@ -172,15 +207,21 @@ class App extends React.Component {
         });
     }
 
-    release=(name)=> {
+    release = (name) => {
+
         let currentList = this.state.currentList;
         let temp = currentList.items[name];
         let idex = this.state.cureenthover;
         currentList.items.splice(name, 1);
         currentList.items.splice(idex, 0, temp);
- 
-
+        let sessions = this.state.sessionstack;
+        
+        let actuallist = JSON.parse(JSON.stringify(this.state.currentList));
+        sessions.push(actuallist);
+        sessions.splice(this.state.sessionstackpoint, sessions.length - this.state.sessionstackpoint -2);
         this.setState(prevState => ({
+            sessionstackpoint: this.state.sessionstackpoint + 1,
+            sessionstack: sessions,
             currentList: currentList
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
@@ -200,7 +241,9 @@ class App extends React.Component {
         this.hideDeleteListModal();
         if (this.state.currentList!=null && this.state.currentList.name === this.state.tobedeletednamepair.name) {
             this.setState(prevState => ({
-                currentList: null
+                currentList: null,
+                sessionstack: [],
+                sessionstackpoint: -1
             }), () => {
                 // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
                 // THE TRANSACTION STACK IS CLEARED
@@ -243,19 +286,46 @@ class App extends React.Component {
 
     }
 
+    redo = ()=>{
+        console.log('redo');
+    }
+
+    undo = () => {
+        let currentList = this.state.currentList;
+        console.log(currentList);
+        currentList = this.state.sessionstack[this.state.sessionstackpoint - 1];
+        console.log(currentList);
+        this.setState(prevState => ({
+            sessionstackpoint: this.state.sessionstackpoint - 1,
+            currentList: currentList
+        }), () => {
+            // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
+            // THE TRANSACTION STACK IS CLEARED
+            
+
+            this.db.mutationUpdateList(currentList);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
+    }
+
+    
     render() {
         return (
             <div id="app-root">
                 <Banner 
                     title='Top 5 Lister'
-                    closeCallback={this.closeCurrentList} />
+                    closeCallback={this.closeCurrentList}
+                    redoCallback={this.redo}
+                    undoCallback={this.undo}
+                    currentList={this.state.currentList}
+                />
                 <Sidebar
                     heading='Your Lists'
                     currentList={this.state.currentList}
                     keyNamePairs={this.state.sessionData.keyNamePairs}
                     createNewListCallback={this.createNewList}
                     deleteListCallback={this.deleteList}
-                    loadListCallback={this.loadList}
+                    loadListCallback={this.click}
                     renameListCallback={this.renameList}
                 />
                 <Workspace

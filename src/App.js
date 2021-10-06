@@ -287,14 +287,25 @@ class App extends React.Component {
     }
 
     redo = ()=>{
-        console.log('redo');
+        let currentList = this.state.currentList;
+        currentList = this.state.sessionstack[this.state.sessionstackpoint + 1];
+        this.setState(prevState => ({
+            sessionstackpoint: this.state.sessionstackpoint + 1,
+            currentList: currentList
+        }), () => {
+            // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
+            // THE TRANSACTION STACK IS CLEARED
+
+
+            this.db.mutationUpdateList(currentList);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
     }
 
     undo = () => {
         let currentList = this.state.currentList;
-        console.log(currentList);
         currentList = this.state.sessionstack[this.state.sessionstackpoint - 1];
-        console.log(currentList);
+        
         this.setState(prevState => ({
             sessionstackpoint: this.state.sessionstackpoint - 1,
             currentList: currentList
@@ -318,6 +329,8 @@ class App extends React.Component {
                     redoCallback={this.redo}
                     undoCallback={this.undo}
                     currentList={this.state.currentList}
+                    sessionstack={this.state.sessionstack}
+                    sessionstackpoint={this.state.sessionstackpoint}
                 />
                 <Sidebar
                     heading='Your Lists'

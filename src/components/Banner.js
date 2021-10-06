@@ -9,6 +9,8 @@ export default class Banner extends React.Component {
                 {title}
                 <EditToolbar
                     currentList={this.props.currentList}
+                    sessionstack={this.props.sessionstack}
+                    sessionstackpoint={this.props.sessionstackpoint}
                     redoCallback={redoCallback}
                     undoCallback={undoCallback}
                     closeCallback={closeCallback}
